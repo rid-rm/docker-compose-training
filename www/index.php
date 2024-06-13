@@ -2,7 +2,7 @@
 
 <html>
  <head>
-  <title>Hello...</title>
+  <title>DataBase</title>
 
   <!-- <meta charset="utf-8">  -->
 
@@ -13,10 +13,9 @@
 </head>
 <body>
     <div class="container">
-        <h1>Hi! I'm happy</h1>
-
-
     <?php
+	
+	//MySQL
     $conn = mysqli_connect('db', 'user', 'test', 'myDb');
 
     if (mysqli_connect_errno()) {
@@ -24,7 +23,7 @@
       exit();
     }
 
-    echo("hhh");
+    echo("MySQL");
 
     $query = "SELECT * From Person";
     $result = mysqli_query($conn, $query);
@@ -46,7 +45,40 @@
     $result->close();
 
     mysqli_close($conn);
+	
+	//PostgreSQL
+	$conn = pg_connect("host=postgres_db dbname=myDb user=user password=test");
 
+	if (!$conn) {
+		echo "Failed to connect to PostgreSQL: " . pg_last_error();
+		exit();
+	}
+
+	echo "PostgreSQL";
+
+	$query = "SELECT * FROM Person";
+	$result = pg_query($conn, $query);
+
+	if (!$result) {
+		echo "An error occurred.\n";
+		exit();
+	}
+
+	echo '<table class="table table-striped">';
+	echo '<thead><tr><th></th><th>id</th><th>name</th></tr></thead>';
+	while ($value = pg_fetch_assoc($result)) {
+		echo '<tr>';
+		echo '<td><a href="#"><span class="glyphicon glyphicon-search"></span></a></td>';
+		foreach ($value as $element) {
+			echo '<td>' . htmlspecialchars($element) . '</td>';
+		}
+		echo '</tr>';
+	}
+	echo '</table>';
+
+	pg_free_result($result);
+	pg_close($conn);
+	
     ?>
     </div>
 </body>
